@@ -39,7 +39,7 @@ if SITE["baseurl"] is not None:
     SITEURL = SITE["url"] + "/" + SITE["baseurl"] 
 else:
     SITEURL = SITE["url"] 
-RELATIVE_URLS = True 
+RELATIVE_URLS = False
 
 DELETE_OUTPUT_DIRECTORY = True
 
