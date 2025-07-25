@@ -43,6 +43,6 @@ RELATIVE_URLS = True
 
 DELETE_OUTPUT_DIRECTORY = True
 
-#GOOGLE_ANALYTICS = ""
+GOOGLE_ANALYTICS = "GTM-T43ZKC2X"
 #FEED_ALL_ATOM = 'feeds/all.atom.xml'
 #CATEGORY_FEED_ATOM = 'feeds/{slug}.atom.xml'
