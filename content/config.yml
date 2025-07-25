@@ -16,7 +16,7 @@ icon: ⚛️ # the emoji used as the favicon (alternatively, provide image name 
 
 # For both fields below, do not include leading / trailing slashes. 
 url: https://dracoargenteus.github.io # the base hostname & protocol for your site
-baseurl: #https://dracoargenteus.github.io
+baseurl: 
 last_updated: true # set to true if you want to display last updated in the footer
 impressum_path:  # set to path to include impressum link in the footer, use the same path as permalink in a page, helps to conform with EU GDPR
 
@@ -67,18 +67,18 @@ github_username: DracoArgenteus
 gitlab_username:
 twitter_username:
 mastodon_username: 
-linkedin_username: test
+linkedin_username: mbhsørensen
 telegram_username: 
 scholar_userid: # your Google Scholar ID
 semanticscholar_id: # your Semantic Scholar ID
 whatsapp_number: # your WhatsApp number (full phone number in international format. Omit any zeroes, brackets, or dashes when adding the phone number in international format.)
-orcid_id: test # your ORCID ID
+orcid_id: 0009-0004-3811-8976 # your ORCID ID
 medium_username: # your Medium username
 quora_username: # your Quora username
 publons_id: # your ID on Publons
 lattes_id: # your ID on Lattes (Brazilian Lattes CV)
 osf_id: # your OSF ID
-research_gate_profile: # your profile on ResearchGate
+research_gate_profile: Mark-Sorensen-4 # your profile on ResearchGate
 scopus_id: # your profile on Scopus
 blogger_url: # your blogger URL
 work_url: # work page URL
@@ -87,7 +87,7 @@ wikidata_id: # your wikidata id
 wikipedia_id: # your wikipedia id (Case sensitive)
 dblp_url: # your DBLP profile url
 stackoverflow_id: # your stackoverflow id
-kaggle_id: test # your kaggle id
+kaggle_id: markbujeheinsrensen # your kaggle id
 lastfm_id: # your lastfm id
 spotify_id: # your spotify id
 pinterest_id: # your pinterest id
@@ -108,7 +108,7 @@ contact_note: >
 google_analytics:  # your Google Analytics measurement ID (format: G-XXXXXXXXXX)
 cronitor_analytics:  # cronitor RUM analytics site ID (format: XXXXXXXXX)
 
-google_site_verification:  # your google-site-verification ID (Google Search Console)
+google_site_verification: PREpPR__PWljKKUoZmdtkX5kpojQ1IpB5f5TQwVFcrw # your google-site-verification ID (Google Search Console)
 bing_site_verification:  # out your bing-site-verification ID (Bing Webmaster)
 
 # -----------------------------------------------------------------------------
