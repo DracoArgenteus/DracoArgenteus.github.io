@@ -1,98 +1,70 @@
-# .github/workflows/deploy.yml
-# This workflow builds your Pelican site and your CV PDF, then deploys to GitHub Pages.
+#deploy.yml
 
-name: Build and Deploy CV and Website
+name: Build and Deploy Pelican Site
 
 on:
-  # Runs on pushes to the main branch
   push:
-    branches: [ "main" ]
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Allow only one concurrent deployment, and disallow cancel in-progress runs.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    branches:
+      - main # Trigger on pushes to your 'main' branch
+  workflow_dispatch: # Allows manual triggering of the workflow from the GitHub UI
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build_and_deploy:
+    runs-on: ubuntu-latest # GitHub-hosted runner, a Linux environment
+
+    # Define permissions for the GITHUB_TOKEN
+    permissions:
+      contents: write # Required for actions/checkout and peaceiris/actions-gh-pages to push to gh-pages
+      pages: write    # Required for deploying to GitHub Pages
+      id-token: write # Required for OIDC, often used by GitHub Pages deployments
+
+    # Concurrency group to (not) cancel in-progress runs if a new push occurs on the same branch
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: false
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository code
+      uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.10"
+    - name: Set up Python environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10' 
+        cache: 'pip' # Cache pip dependencies for faster subsequent runs
 
-      - name: Install dependencies
-        run: |
-          echo "Installing dependencies..."
-          python -m pip install --upgrade pip
-          # Install Pelican and other site dependencies from your requirements.txt
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Install Python dependencies
+      # Conditionally install from requirements.txt if it exists, otherwise install core dependencies.
+      # This is more robust for templates that might or might not ship with a requirements.txt initially.
+      run: |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        else
+          echo "requirements.txt not found. Installing core Pelican dependencies."
+          pip install pelican PyYAML markdown bibtexparser invoke
+          # Add any other core dependencies for al-folio-python if not in requirements.txt
+        fi
 
-          # install @rbardini/resumed and the jsonresume-theme-class theme
-          # npm install resumed jsonresume-theme-class # or your theme of choice
+    # Note: Your pelicanconf.py has 'render_main_scss(SITE)' which handles SCSS compilation in Python.
+    # This typically means you do *not* need a separate Node.js setup or npm install for Sass.
 
-      # - name: Generate PDF from CV
-      #   run: |
-      #     echo "Generating PDF from content/data/cv.yml..."
-      #     # The al-folio-python template is configured to copy static files from 'content/extra'.
-      #     # We create this directory to place our generated PDF into.
-      #     # mkdir -p .build content/pdf
-      #     mkdir -p content/pdf
-          
-      #     # # Step 1: Convert your YAML CV to a temporary JSON file in the .build directory.
-      #     # python -c "import yaml, json; print(json.dumps(yaml.safe_load(open('content/data/cv.yml'))))" > .build/resume.json
-          
-      #     # Step 2: Generate the PDF, reading the temporary JSON file from the .build directory.
+    - name: Build Pelican site
+      # Use the specific build command instructed by the template author.
+      # This command will use publishconf.py, which typically has SITEURL set for the live domain.
+      run: python -m pelican -s publishconf.py
 
-      #     echo "Validating resume.json"
-      #     # npx resumed validate .build/resume.json
-      #     npx resumed validate content/data/resume.json
-          
-      #     npx resumed export content/data/resume.json --output output/pdf/CV.pdf --theme jsonresume-theme-even 
-      #     echo "CV.pdf successfully generated at content/pdf/CV.pdf"
-          
-      #     # # Step 3: Clean up the intermediate build directory and its contents.
-      #     # rm -rf .build
+    # Fix permissions for the output directory before deployment.
+    # This ensures files created by Pelican/Python have correct read/execute permissions for the web server.
+    - name: Fix permissions for output directory
+      run: |
+        chmod -c -R +rX "output/" | while read line; do echo "Changed: $line"; done
 
-      - name: Build website with Pelican
-        run: |
-          echo "Building Pelican site..."
-          # Pelican will now build the HTML site and automatically find and copy 
-          # 'content/pdf/CV.pdf' to the final 'output/pdf/CV.pdf' directory.
-          python -m pelican -s publishconf.py
-
-      - name: Fix permissions for artifact
-        run: |
-          chmod -c -R +rX "output/" | while read line; do
-            echo "::warning title=Invalid file permissions automatically fixed::$line"
-          done
-
-      - name: Upload artifact for deployment
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload the entire output directory
-          path: './output'
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    # This job depends on the 'build' job completing successfully
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./output
+        publish_branch: gh-pages
+        # For a user page (DracoArgenteus.github.io), you typically don't need the 'cname' option here.
+        # GitHub Pages handles the domain implicitly for user pages.
+        # cname: dracoargenteus.github.io # Uncomment ONLY if you explicitly want a CNAME file for THIS specific domain.
